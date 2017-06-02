@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace iTunesPlugin
+namespace Notification
 {
     internal class PropVariantHelper
     {
         private static class NativeMethods
         {
             [DllImport("Ole32.dll", PreserveSig = false)]
-            internal static extern void PropVariantClear(ref ShellHelpers.PROPVARIANT pvar);
+            internal static extern void PropVariantClear(ref PROPVARIANT pvar);
         }
 
-        private ShellHelpers.PROPVARIANT variant;
-        public ShellHelpers.PROPVARIANT Propvariant
+        private PROPVARIANT variant;
+        public PROPVARIANT Propvariant
         {
             get { return variant; }
         }

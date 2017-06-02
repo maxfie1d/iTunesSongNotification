@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace iTunesPlugin
+namespace Notification
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct PROPERTYKEY

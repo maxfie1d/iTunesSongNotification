@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace iTunesPlugin.ShellHelpers
+namespace Notification
 {
     // These are the new APIs for Windows 10
     #region NewAPIs
