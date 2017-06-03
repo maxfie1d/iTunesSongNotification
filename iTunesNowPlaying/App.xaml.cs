@@ -19,6 +19,7 @@ namespace iTunesNowPlaying
         private NotifyIconWrapper notifyIcon;
         private iTunesApp app;
         private Track? mostRecentTrack;
+        private ArtworkCache artworkCache;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -27,6 +28,7 @@ namespace iTunesNowPlaying
             // Application.Shutdown()メソッドが呼ばれた時にのみアプリを終了する
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.notifyIcon = new NotifyIconWrapper();
+            this.artworkCache = new ArtworkCache();
 
             // COM初期化
             app = new iTunesApp();
@@ -43,7 +45,7 @@ namespace iTunesNowPlaying
             base.OnExit(e);
             this.notifyIcon.Dispose();
 
-            Dispose();
+            DisposeResources();
             NotificationActivator.Uninitialize();
         }
 
@@ -59,65 +61,21 @@ namespace iTunesNowPlaying
             bool shouldShowNotification = !(mostRecentTrack?.Title == title && mostRecentTrack?.PlayedCount == playedCount);
             if (shouldShowNotification)
             {
-                ShowSongNotification(track.Name, track.Artist, track.Album, GetArtwork(track));
+                string artwork = this.artworkCache.GetArtworkPath(track);
+                ShowSongNotification(track.Name, track.Artist, track.Album, artwork);
                 mostRecentTrack = new Track(title, playedCount);
-            }
-        }
-
-        private static string GetArtwork(IITTrack track)
-        {
-            IITArtworkCollection artwork = track.Artwork;
-            if (artwork?.Count > 0)
-            {
-                foreach (IITArtwork a in artwork)
-                {
-                    string extension = GetArtworkExtension(a.Format);
-                    if (extension != null)
-                    {
-                        string path = Environment.CurrentDirectory + "\\artwork" + extension;
-                        a.SaveArtworkToFile(path);
-                        return path;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Convert ITArtworkformat to extension as string
-        /// </summary>
-        /// <param name="format"></param>
-        /// <returns></returns>
-        private static string GetArtworkExtension(ITArtworkFormat format)
-        {
-            switch (format)
-            {
-                case ITArtworkFormat.ITArtworkFormatUnknown: return null;
-                case ITArtworkFormat.ITArtworkFormatJPEG: return ".jpg";
-                case ITArtworkFormat.ITArtworkFormatPNG: return ".png";
-                case ITArtworkFormat.ITArtworkFormatBMP: return ".bmp";
-                default:
-                    return null;
             }
         }
 
         private void oniTunesQuitting()
         {
-            Dispose();
+            DisposeResources();
         }
 
         /// <summary>
         /// Dispose resources
         /// </summary>
-        private void Dispose()
+        private void DisposeResources()
         {
             if (this.app != null)
             {
@@ -128,6 +86,9 @@ namespace iTunesNowPlaying
                 // COMを解放
                 Marshal.ReleaseComObject(app);
                 app = null;
+
+                // アートワークキャッシュを削除
+                this.artworkCache.CleanCache();
             }
         }
 
