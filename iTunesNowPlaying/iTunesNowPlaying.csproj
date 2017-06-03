@@ -69,6 +69,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Track.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Notification\NotificationActivator.cs" />

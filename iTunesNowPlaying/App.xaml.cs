@@ -18,6 +18,7 @@ namespace iTunesNowPlaying
     {
         private NotifyIconWrapper notifyIcon;
         private iTunesApp app;
+        private Track? mostRecentTrack;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -49,7 +50,18 @@ namespace iTunesNowPlaying
         private void app_OnPlayerPlayEvent(object iTrack)
         {
             var track = (IITTrack)iTrack;
-            ShowSongNotification(track.Name, track.Artist, track.Album, GetArtwork(track));
+
+            var title = track.Name;
+            var playedCount = track.PlayedCount;
+
+            // タイトルと再生回数が両方同じでなければ
+            // 新規に再生される曲として通知を出す
+            bool shouldShowNotification = !(mostRecentTrack?.Title == title && mostRecentTrack?.PlayedCount == playedCount);
+            if (shouldShowNotification)
+            {
+                ShowSongNotification(track.Name, track.Artist, track.Album, GetArtwork(track));
+                mostRecentTrack = new Track(title, playedCount);
+            }
         }
 
         private static string GetArtwork(IITTrack track)
@@ -79,6 +91,11 @@ namespace iTunesNowPlaying
             }
         }
 
+        /// <summary>
+        /// Convert ITArtworkformat to extension as string
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
         private static string GetArtworkExtension(ITArtworkFormat format)
         {
             switch (format)
@@ -97,6 +114,9 @@ namespace iTunesNowPlaying
             Dispose();
         }
 
+        /// <summary>
+        /// Dispose resources
+        /// </summary>
         private void Dispose()
         {
             if (this.app != null)
