@@ -9,7 +9,7 @@ namespace iTunesNowPlaying
 {
     public class ArtworkCache
     {
-        public static string CacheFolder => Environment.CurrentDirectory + "\\artwork\\";
+        public static string CacheFolder => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\iTunesNowPlaying\\artwork\\";
         private const string DefaultArtworkName = "artwork";
 
         public ArtworkCache()
